@@ -311,7 +311,16 @@ different packages:
 import sys, string
 from types import *
 
-DICT_TYPES = {DictionaryType: 1}
+if sys.version < '3':
+    integer_types = (int, long,)
+    string_types = (basestring,)
+    split = string.split
+else:
+    integer_types = (int,)
+    string_types = (str,)
+    split = str.split
+
+DICT_TYPES = {type(dict()): 1}
 try:
     from BTree import BTree
     DICT_TYPES[BTree] = 1
@@ -349,33 +358,37 @@ instance_dump = 'module'                # or 'all', 'none', 'package':
 TYPE_NAMES = {
     BuiltinFunctionType: 'builtin',
     BuiltinMethodType: 'builtin',
-    ClassType: 'class',
     CodeType: 'code',
-    ComplexType: 'complex',
-    DictType: 'dictionary',
-    DictionaryType: 'dictionary',
-    EllipsisType: 'ellipsis',
-    FileType: 'file',
-    FloatType: 'float',
+    type(complex): 'complex',
+    type(dict): 'dictionary',
+    type(float): 'float',
     FrameType: 'frame',
     FunctionType: 'function',
-    InstanceType: 'instance',
-    IntType: 'int',
+    type(int): 'int',
     LambdaType: 'function',
-    ListType: 'list',
-    LongType: 'long int',
+    type(list): 'list',
     MethodType: 'instance method',
     ModuleType: 'module',
-    NoneType: 'None',
-    SliceType: 'slice',
-    StringType: 'string',
+    type(None): 'None',
+    type(string): 'string',
     TracebackType: 'traceback',
-    TupleType: 'tuple',
-    TypeType: 'type',
-    UnboundMethodType: 'instance method',
-    UnicodeType: 'unicode',
-    XRangeType: 'xrange',
+    type(tuple): 'tuple',
+    type(type): 'type',
     }
+try:
+    TYPE_NAMES[ClassType] = 'class'
+    TYPE_NAMES[DictType] = 'dictionary'
+    TYPE_NAMES[DictProxyType] = 'dictionary'
+    TYPE_NAMES[EllipsisType] = 'ellipsis'
+    TYPE_NAMES[FileType] = 'file'
+    TYPE_NAMES[InstanceType] = 'instance'
+    TYPE_NAMES[LongType] = 'long int'
+    TYPE_NAMES[SliceType] = 'slice'
+    TYPE_NAMES[UnboundMethodType] = 'instance method'
+    TYPE_NAMES[UnicodeType] = 'unicode',
+    TYPE_NAMES[XRangeType] = 'xrange',
+except NameError: pass
+
 
 def get_type_name (type):
     try:
@@ -395,7 +408,7 @@ class Dumper:
             self.out = output
 
     def __getattr__ (self, attr):
-        if self.__dict__.has_key ('_' + attr):
+        if '_' + attr in self.__dict__:
             val = self.__dict__['_' + attr]
             if val is None:             # not defined in object;
                 # attribute exists in instance (after adding _), but
@@ -407,11 +420,11 @@ class Dumper:
                 return val
         else:
             # _ + attr doesn't exist at all
-            raise AttributeError, attr
+            raise AttributeError(attr)
 
 
     def __setattr__ (self, attr, val):
-        if self.__dict__.has_key ('_' + attr):
+        if '_' + attr in self.__dict__:
             self.__dict__['_' + attr] = val
         else:
             self.__dict__[attr] = val
@@ -447,13 +460,13 @@ class Dumper:
 
             self.seen[id(val)] = 1
 
-            if DICT_TYPES.has_key(t):
+            if t in DICT_TYPES:
                 if summarize:
                     self._writeln("%s%s:" % (indent, object_summary (val)))
                     indent = indent + '  '
                 self.dump_dict (val, depth, indent)
 
-            elif t in (ListType, TupleType):
+            elif issubclass(t, (list, tuple)):
                 if summarize:
                     self._writeln("%s%s:" % (indent, object_summary (val)))
                     indent = indent + '  '
@@ -463,14 +476,14 @@ class Dumper:
                 self.dump_instance (val, depth, indent, summarize)
 
             else:
-                raise RuntimeError, "this should not happen"
+                raise RuntimeError("this should not happen")
 
     # _dump ()
 
 
     def dump_dict (self, dict, depth, indent, shallow_attrs=()):
-        keys = dict.keys()
-        if type(keys) is ListType:
+        keys = list(dict.keys())
+        if type(keys) is type(list):
             keys.sort()
 
         for k in keys:
@@ -505,10 +518,10 @@ class Dumper:
 
             previous_instance = self.containing_instance[-1]
             container_module = previous_instance.__class__.__module__
-            container_package = (string.split (container_module, '.'))[0:-1]
+            container_package = (split (container_module, '.'))[0:-1]
 
             current_module = inst.__class__.__module__
-            current_package = (string.split (current_module, '.'))[0:-1]
+            current_package = (split (current_module, '.'))[0:-1]
 
             #print "dumping instance contained in another instance %s:" % \
             #      previous_instance
@@ -555,8 +568,10 @@ class Dumper:
 # -- Utility functions -------------------------------------------------
 
 def atomic_type (t):
-    return t in (NoneType, StringType, IntType, LongType, FloatType, ComplexType)
-
+    return issubclass(t,
+                      (None.__class__, float, complex)) \
+                      or issubclass(t, integer_types) \
+                      or issubclass(t, string_types)
 
 def short_value (val):
     #if atomic_type (type (val)):
@@ -564,18 +579,18 @@ def short_value (val):
 
     t = type(val)
 
-    if (not DICT_TYPES.has_key(t) and t not in (ListType, TupleType) and 
-            not is_instance(val)):
+    if (t not in DICT_TYPES and not isinstance(val, list) and
+        not isinstance(val, tuple) and not is_instance(val)):
         return 1
 
-    elif t in (ListType, TupleType) and len (val) <= 10:
+    elif (isinstance(val, list) or isinstance(val, tuple)) and len (val) <= 10:
         for x in val:
             if not atomic_type (type (x)):
                 return 0
         return 1
 
-    elif DICT_TYPES.has_key(t) and len (val) <= 5:
-        for (k,v) in val.items():
+    elif t in DICT_TYPES and len (val) <= 5:
+        for (k,v) in list(val.items()):
             if not (atomic_type (type (k)) and atomic_type (type (v))):
                 return 0
         return 1
@@ -586,7 +601,23 @@ def short_value (val):
 
 def short_dump (val):
     if atomic_type(type(val)) or is_instance(val) or is_class(val):
-        return `val`
+        return repr(val)
+    
+    elif isinstance(val, (list, tuple)):
+        if isinstance(val, list):
+            retval = '['
+        else:
+            retval = '('
+        if len(val):
+            retval += short_dump(val[0])
+            for item in val[1:]:
+                retval += ", " + short_dump(item)
+        if isinstance(val, list):
+            retval += ']'
+        else:
+            retval += ')'
+        
+        return retval
 
     else:
         try:
@@ -594,7 +625,7 @@ def short_dump (val):
         except UnicodeError as err:
             val = "[got unicode error trying to represent value: " + str(err) +\
                 ']'
-        return object_summary (val) + ': ' + `val`
+        return object_summary (val) + ': ' + repr(val)
     
         
 
@@ -616,15 +647,20 @@ def object_summary (val):
     
 
 def is_instance (val):
-    if type(val) is InstanceType:
-        return 1
-    # instance of extension class, but not an actual extension class
-    elif (hasattr(val, '__class__') and
-          hasattr(val, '__dict__') and
-          not hasattr(val, '__bases__')):
-        return 1
-    else:
-        return 0
+    try:
+        if type(val) is InstanceType:
+            return 1
+        # instance of extension class, but not an actual extension class
+        elif (hasattr(val, '__class__') and
+              hasattr(val, '__dict__') and
+              not hasattr(val, '__bases__')):
+            return 1
+        else:
+            return 0
+    except NameError:  # Python > 3
+        return (hasattr(val, '__class__') and \
+              hasattr(val, '__dict__') and \
+              not hasattr(val, '__bases__'))
 
 def is_class (val):
     return hasattr(val, '__bases__')
@@ -639,14 +675,14 @@ def dump(val, output=None):
         Dumper(output=output).dump(val)
 
 def dumps(val):
-    from StringIO import StringIO
+    from io import StringIO
     out = StringIO()
     Dumper(output=out).dump(val)
     return out.getvalue()
 
 
 if __name__ == "__main__":
-
+    
     l1 = [3, 5, 'hello']
     t1 = ('uh', 'oh')
     l2 = ['foo', t1]
@@ -667,7 +703,7 @@ if __name__ == "__main__":
     l[1][2] = tuple (range (11))
     dumper.dump (l)
     dumper.max_depth = None
-    print dumper.max_depth
+    print(dumper.max_depth)
     
     class Foo: pass
     class Bar: pass
