@@ -1,0 +1,3 @@
+To locally install a version of this code such that you can modify the installed
+version:
+pip install -e .           # the pip way (which just calls "setup.py develop")

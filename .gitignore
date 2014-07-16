@@ -2,3 +2,6 @@ __*
 *.pyc
 .*project*
 .*html*
+*.egg-info
+dist
+*.zip

@@ -430,7 +430,7 @@ class Dumper:
             self.__dict__[attr] = val
 
     def _writeln (self, line):
-        self.out.write(line + "\n")
+        self.out.write((line + "\n").decode("utf-8"))
 
 
     def dump (self, val, indent='', summarize=1):

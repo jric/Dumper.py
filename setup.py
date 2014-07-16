@@ -14,7 +14,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='1.0.0',
+    version='1.0.2',
 
     description='Tool to conveniently describe any Python datastructure',
     long_description=long_description,
@@ -49,10 +49,10 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-#         'Programming Language :: Python :: 3',
-#         'Programming Language :: Python :: 3.2',
-#         'Programming Language :: Python :: 3.3',
-#         'Programming Language :: Python :: 3.4',
+         'Programming Language :: Python :: 3',
+         'Programming Language :: Python :: 3.2',
+         'Programming Language :: Python :: 3.3',
+         'Programming Language :: Python :: 3.4',
     ],
 
     # What does your project relate to?
@@ -68,11 +68,15 @@ setup(
     # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
     install_requires=[],
 
+    # Accept all data files and directories matched by MANIFEST.in or found in
+    # source control.
+    include_package_data=True,
+    
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-#        'sample': ['package_data.dat'],
+        '': ['README.md'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may

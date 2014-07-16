@@ -282,3 +282,10 @@ useful logging.
           child: <Bar instance at 0x2415d8> 
             s: 'hello'
 
+===
+
+CHANGELOG:
+
+1.0.2:  Include README.md and MANIFEST.in in the distribution.
+1.0.1:  Include the package in the distribution.
+
