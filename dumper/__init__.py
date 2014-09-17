@@ -390,11 +390,11 @@ try:
 except NameError: pass
 
 
-def get_type_name (type):
+def get_type_name (some_type):
     try:
-        return TYPE_NAMES[type]
+        return TYPE_NAMES[some_type]
     except KeyError:
-        return type.__name__
+        return some_type.__name__
 
 
 class Dumper:
@@ -413,8 +413,8 @@ class Dumper:
             if val is None:             # not defined in object;
                 # attribute exists in instance (after adding _), but
                 # not defined: get it from the module globals
-                globals = vars(sys.modules[__name__])
-                return globals.get(attr)
+                name_globals = vars(sys.modules[__name__])
+                return name_globals.get(attr)
             else:
                 # _ + attr exists and is defined (non-None)
                 return val
@@ -430,8 +430,17 @@ class Dumper:
             self.__dict__[attr] = val
 
     def _writeln (self, line):
-        self.out.write((line + "\n").decode("utf-8"))
-
+        try:
+            self.out.write(line.decode("utf-8"))
+        except AttributeError:
+            self.out.write(line) # python 3
+        self.out.write("\n")
+        
+    def _write (self, text):
+        try:
+            self.out.write(text.decode("utf-8"))
+        except AttributeError:
+            self.out.write(text)
 
     def dump (self, val, indent='', summarize=1):
         self.seen = {}
@@ -444,7 +453,7 @@ class Dumper:
         t = type (val)
 
         if short_value (val):
-            self._writeln("%s%s" % (indent, short_dump (val)))
+            self._write("%s%s" % (indent, short_dump (val)))
 
         else:
             depth = depth + 1
@@ -481,13 +490,13 @@ class Dumper:
     # _dump ()
 
 
-    def dump_dict (self, dict, depth, indent, shallow_attrs=()):
-        keys = list(dict.keys())
+    def dump_dict (self, a_dict, depth, indent, shallow_attrs=()):
+        keys = list(a_dict.keys())
         if type(keys) is type(list):
             keys.sort()
 
         for k in keys:
-            val = dict[k]
+            val = a_dict[k]
             if short_value (val) or k in shallow_attrs:
                 self._writeln("%s%s: %s" % (indent, k, short_dump (val)))
             else:
@@ -690,10 +699,12 @@ if __name__ == "__main__":
           'k2': l1,
           'k2': l2}
 
-    dump (l1)
-    dump (t1)
+    print("a list: ", dumps (l1), "; a tuple: ", dumps (t1))
+    print("a complex list: ")
     dump (l2)
     dump (d1)
+    dump (19)
+    dump ("\nMy birth year!\n")
 
     dumper = Dumper (max_depth=1)
     l = ['foo', ['bar', 'baz', (1, 2, 3)]]
