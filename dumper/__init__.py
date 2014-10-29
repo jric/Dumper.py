@@ -434,7 +434,7 @@ class Dumper:
             self.out.write(line.decode("utf-8"))
         except AttributeError:
             self.out.write(line) # python 3
-        self.out.write("\n")
+        self.out.write(u"\n")
         
     def _write (self, text):
         try:
@@ -703,6 +703,8 @@ if __name__ == "__main__":
     print("a complex list: ")
     dump (l2)
     dump (d1)
+    print("same dict, printed from dumps(): ")
+    print(dumps(d1))
     dump (19)
     dump ("\nMy birth year!\n")
 

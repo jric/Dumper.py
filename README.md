@@ -286,6 +286,7 @@ useful logging.
 
 CHANGELOG:
 
+1.0.4:  Fixed problem in Python 2 when using io.StringIO with dumper.
 1.0.3:  Fixed problems in Python 3 related to trying to use decode as member of str.
 1.0.2:  Include README.md and MANIFEST.in in the distribution.
 1.0.1:  Include the package in the distribution.
