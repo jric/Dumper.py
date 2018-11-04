@@ -8,26 +8,29 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(path.join(here, 'demo.py'), encoding='utf-8') as f:
+    long_description = ''.join([long_description, "\n", f.read()])
+
 setup(
-    name='Dumper',
+    name='app_error',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # http://packaging.python.org/en/latest/tutorial.html#version
-    version='1.0.4',
+    version='1.0.0',
 
-    description='Tool to conveniently describe any Python datastructure',
+    description='Make logging and reporting of errors easier, more informative, and more "standard."',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/jric/Dumper.py',
+    url='https://github.com/CheggEng/REPLACE_ME',  # TODO:  REPLACE THIS
 
     # Author details
     author='Joshua Richardson (contact on github)',
     author_email='joshuarbox-junk1@yahoo.com',
 
-    # Choose your license
-    license='MIT',
+    # Only specify here if not using a known license
+    #license='PROBABLY_DO_NOT_NEED_THIS',
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -35,24 +38,26 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 5 - Production/Stable',
+        'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
+        'Topic :: Utilities',
+        'Environment :: Console',
 
-        # Pick your license as you wish (should match "license" above)
-        'License :: OSI Approved :: MIT License',
+        # Pick your license as you wish
+        'License :: OSI Approved :: Apache Software License',
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-         'Programming Language :: Python :: 3',
-         'Programming Language :: Python :: 3.2',
-         'Programming Language :: Python :: 3.3',
-         'Programming Language :: Python :: 3.4',
+#         'Programming Language :: Python :: 2',
+#         'Programming Language :: Python :: 2.6',
+#         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+#          'Programming Language :: Python :: 3.2',
+#          'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.6',
     ],
 
     # What does your project relate to?
@@ -66,7 +71,7 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/technical.html#install-requires-vs-requirements-files
-    install_requires=[],
+    install_requires=['dumper'],
 
     # Accept all data files and directories matched by MANIFEST.in or found in
     # source control.
@@ -76,7 +81,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        '': ['README.md'],
+        '': ['README.md', 'demo.py'],
     },
 
     # Although 'package_data' is the preferred approach, in some case you may
