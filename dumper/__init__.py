@@ -6,7 +6,7 @@ and has sensible options for limiting the extent of the dump both by
 simple depth and by some rules for how to handle contained instances.
 
 Copyright (c) 2009 Python Software Foundation
-Copyright (c) 2014 Joshua Richardson, Chegg Inc.
+Copyright (c) 2014,2018 Joshua Richardson, Chegg Inc.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
