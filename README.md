@@ -286,6 +286,7 @@ useful logging.
 
 CHANGELOG:
 
+1.1.0:  Added more supported versions of python and a test framework.
 1.0.4:  Fixed problem in Python 2 when using io.StringIO with dumper.
 1.0.3:  Fixed problems in Python 3 related to trying to use decode as member of str.
 1.0.2:  Include README.md and MANIFEST.in in the distribution.
