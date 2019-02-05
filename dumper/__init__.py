@@ -683,10 +683,13 @@ def dump(val, output=None):
     else:
         Dumper(output=output).dump(val)
 
-def dumps(val):
+def dumps(val, *argv):
     from io import StringIO
     out = StringIO()
-    Dumper(output=out).dump(val)
+    dumper = Dumper(output=out)
+    dumper.dump(val)
+    for val in argv:
+        dumper.dump(val)
     return out.getvalue()
 
 

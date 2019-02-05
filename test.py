@@ -20,6 +20,37 @@ with a newline''')
 def test_do_dump_scalars():
     assert_output_as_expected(do_dump_scalars)
     
+def do_dumps_multi_values():
+    s = dumps(1, " is less than ", 10) # returns unicode string in py2
+    if sys.version < (3, 0):
+        s = s.encode('ascii', 'replace') # convert back to regular string
+    dump(s)
+    return "\"1' is less than '10\""
+
+def test_dumps_multi_values():
+    assert_output_as_expected(do_dumps_multi_values)
+    
+def do_dump_json():
+    obj = {
+            "httpCode": 200,
+            "extensionData": [
+                {
+                    "extensionValue": "egg"
+                }
+            ]
+        }
+    dump(obj)
+    return '''
+<dict at {WORD}>:
+  httpCode: 200
+  extensionData: <list at {WORD}>
+    0: <dict at {WORD}>:
+      extensionValue: 'egg'
+'''
+
+def test_do_dump_json():
+    assert_output_matches_template(do_dump_json)
+    
 # END TEST CASES
     
 def text_type(val):
@@ -27,7 +58,7 @@ def text_type(val):
         return unicode(val)
     else:
         return str(val)
-
+    
 def assertMatching(a, b):
     ''' Asserts that the lines from string, a, match the lines in the string, b.
     a is the expected string / pattern
@@ -40,7 +71,11 @@ def assertMatching(a, b):
         raise AssertionError("a has " + text_type(len(a_lines)) + ", but b has " + text_type(len(b_lines)) + " lines: a={" + a + "}, b={" + b + "}")
     for i in range(0, len(a_lines)):
         assert a_lines[i] == b_lines[i]
-    
+
+def assert_output_matches_template(func):
+    # TODO: implement this
+    pass
+  
 def assert_output_as_expected(func):
     # buffer stdout
     try:
